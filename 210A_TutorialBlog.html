@@ -4,173 +4,110 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Storing, Accessing, and Displaying JSON Data in Local Storage</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 20px;
-        }
-        h1, h2, h3 {
-            color: #333;
-        }
-        code {
-            background-color: #f4f4f4;
-            padding: 2px 4px;
-            border-radius: 4px;
-        }
-        pre {
-            background-color: #f4f4f4;
-            padding: 10px;
-            border-radius: 4px;
-            overflow-x: auto;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css"> 
 </head>
 <body>
 
-<h1>Storing, Accessing, and Displaying JSON Data in Local Storage</h1>
+    <div class="container">
+        <h1>Storing, Accessing, and Displaying JSON Data in Local Storage</h1>
 
-<h2>Introduction</h2>
-<p>Local Storage, part of the Web Storage API, allows web applications to store data in a web browser on a user's device. This data persists even when the browser is closed and reopened, making it a useful tool for client-side storage in web development. One common use case for Local Storage is storing JSON data, which can represent complex data structures like arrays and objects. JSON (JavaScript Object Notation) is a lightweight, text-based data format that is easy for both humans and machines to read and write.</p>
-<p>In this document, we will explore how to store, access, and display JSON data in Local Storage. We will walk through the process of encoding and decoding JSON data, demonstrate how to use Local Storage with JSON, and discuss potential pitfalls to avoid. Additionally, we will explore best practices for working with JSON data and how to manage local storage effectively.</p>
+    <h2>Introduction</h2>
 
-<h2>What is Local Storage?</h2>
-<p>Local Storage is a simple, client-side storage mechanism that allows web applications to store data in a web browser. Data stored in Local Storage is key-value based and persists even when the user closes the browser or navigates to another page. Local Storage offers storage limits of about 5MB per domain in most modern browsers, making it suitable for storing moderate amounts of data.</p>
-<p>Local Storage is part of the Web Storage API, which also includes Session Storage. While Local Storage data persists until explicitly deleted, Session Storage data is cleared when the session ends, typically when the browser window is closed.</p>
+<p>If you have had any experience building a website, you know how important it is to store the data imputed, changed, and connected to the user. If you can’t store information, a website is pretty much a word document available on the internet. You need to store data if you want to do anything meaningful on a website. There are many ways of doing this. You could send information to the server and store it all there. Unfortunately, this is inefficient and extremely slow when you have multiple users storing and accessing data at the same time. A much better way of storing site data is in the browser’s local storage.</p> 
+<p>Local storage is part of the Web Storage API, and it lets web applications store data in a web browser on a user's device. This allows the data imputed by your users to remain even when the browser is closed and reopened. It is a much better form of web development, as you are able to store user-specific info directly on each user’s website. Local storage is mostly used for storing JavaScript Object Notation or JSON data. Luckily, JSON can store complex data structures and objects, allowing the local storage to store tons of information. JSON is a text-based data format that is easy for both people and devices to read and write. </p>
+<p>In this blog, I will demonstrate how to store, access, and display JSON data in Local Storage. I will also explain how to encode and decode JSON data, along with showing how to store JSON objects in the local storage.</p>
+<h2>Basic Info</h2>
+<h3>So what exactly is local storage?</h3>
+<p>Local storage is a storage mechanism that is implemented on the client-side of a website. Local storage lets web applications store data in a web browser. It stores JSON info in key-value pairs, and lets the stored JSON info remain even if the user closes the browser or refreshes the page. Local Storage has a storage limit of around 5MiB per origin in most modern browsers, so it is able to store moderate amounts of data.</p>
+<p>Local storage is part of the Web Storage API alongside session storage. The biggest difference between the two is that info stored in local storage persists until explicitly deleted, whereas session storage data is cleared when the server session ends, like when the browser window is closed. (https://rxdb.info/articles/localstorage.html: This website gives a more comprehensive guide into what local storage is, and how to use it.)</p>
 
-<h2>What is JSON?</h2>
-<p>JSON (JavaScript Object Notation) is a widely-used data format for representing structured data. It is lightweight and easy to read and write, which makes it ideal for transferring data between a client and server. JSON data can represent objects, arrays, strings, numbers, booleans, and null values. Since it is a text-based format, it can be easily stored in Local Storage.</p>
-<p>JSON is typically structured like this:</p>
-<pre><code>{
-  "name": "John Doe",
-  "age": 30,
-  "isActive": true,
-  "hobbies": ["Reading", "Traveling", "Photography"]
+<h3>Now what is JSON?</h3>
+<p>JSON is a data format that represents structured data. It is extremely versatile, and it is compatible with many different coding languages, not just JavaScript. JSON is very easy to read and write, as it consists of key-value pairs that represent various elements of an object. It is also very helpful in transferring data between a client and server. JSON data can represent objects, arrays, strings, numbers, booleans, and null values. It is a text-based format, so it is readable in a text editor and very lightweight for the computer to handle. (https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/JSON: This website gives a very good explanation of what JSON is and how to write in it.)</p>
+<p>A standard JSON object literal looks like the following code:</p>
+<code><pre>{
+  "name": "Silly Billy",
+  "age": 42,
+  "isOnline": true,
+  "skills": ["Programming", "Dancing", "Sleeping"]
 }</code></pre>
-<p>In this example, we have a JSON object with properties name, age, isActive, and hobbies. The hobbies property is an array containing strings.</p>
+<p>This object has the properties name, age, isOnline, and skills. These properties are paired to the values immediately following the colons. The skills property is an array containing several strings.</p>
 
-<h2>Why Use JSON with Local Storage?</h2>
-<p>Storing JSON data in Local Storage allows you to preserve state and user preferences across page reloads or browser sessions. Examples of data you might store in Local Storage include user settings, shopping cart contents, form data, and application state.</p>
-<p>Using JSON with Local Storage offers several benefits:</p>
-<ul>
-    <li><strong>Persistence:</strong> Data remains available across sessions and even after the browser is closed and reopened.</li>
-    <li><strong>Simplicity:</strong> JSON is easy to work with, both for humans and machines.</li>
-    <li><strong>Speed:</strong> Local Storage is fast and does not require server communication, making it ideal for temporary client-side storage.</li>
-</ul>
-<p>However, there are also some limitations:</p>
-<ul>
-    <li><strong>Storage Limitations:</strong> Local Storage has a storage limit (usually around 5MB per domain).</li>
-    <li><strong>Security:</strong> Data stored in Local Storage is not encrypted, so it is vulnerable to XSS attacks if not handled properly.</li>
-    <li><strong>Synchronous:</strong> Local Storage operations are synchronous, meaning they can block the main thread if used improperly, especially for large data sets.</li>
-</ul>
-
-<h2>Storing JSON Data in Local Storage</h2>
-
-<h3>Storing Data</h3>
-<p>The first step in using Local Storage with JSON is to store data. Since Local Storage only supports string data types, JSON objects and arrays must be converted (or serialized) into strings before being stored. This process is called "stringifying."</p>
-<p>To store JSON data, we use the <code>JSON.stringify()</code> method to convert an object into a string. Then, we use the <code>localStorage.setItem()</code> method to store the string in Local Storage.</p>
-<p>Here is an example of how to store a JSON object in Local Storage:</p>
-<pre><code>const user = {
-  name: "John Doe",
-  age: 30,
-  isActive: true,
-  hobbies: ["Reading", "Traveling", "Photography"]
+<h3>Why use them together?</h3>
+<p>Storing JSON data in Local Storage lets you preserve state (the web application’s data) and user data across page reloads or server sessions. You might use local storage to hold user settings, shopping cart contents, form data, and application state. JSON is also quite quick, and frees your page from needing to send as much data to the server. </p>
+<p>Unfortunately though, storing all of your user’s info in the local storage has some drawbacks. Local Storage has a storage limit, so it can’t store data over a certain size. Not only that, but the info stored in local storage is not encrypted. The lack of encryption should always be taken note of, as other people can access it, and it is vulnerable to XSS attacks if you don’t take countermeasures. The final drawback of local storage is that it is synchronous. This means that its operations can block the main thread (the main thread handles page rendering, JavaScript code, and user input) if it is used to store large data sets.</p>
+<h2>Storing your JSON data in local storage</h2>
+<h3>Storing basic data</h3>
+<p>The first step in using local storage and JSON together is to actually store the data. Local storage only supports string data types, so JSON objects and arrays must be converted into strings before being stored. You do this with a command called stringify.</p>
+<p>The syntax for this is JSON.stringify(). This method converts an object into a string. Then, we use the command localStorage.setItem() to store the stringified object in local storage.</p>
+<p>Here is an example of this with comments that explain each method:</p>
+<code><pre>// Make a JSON object
+  let user = {
+  "name": "Silly Billy",
+  "age": 42,
+  "isOnline": true,
+  "skills": ["Programming", "Dancing", "Sleeping"]
 };
 
-// Convert the JSON object to a string
-const userString = JSON.stringify(user);
+// Convert the JSON object to a string so it is formatted correctly
+let userString = JSON.stringify(user);
 
-// Store the string in Local Storage
+// Push the string into Local Storage
 localStorage.setItem("user", userString);</code></pre>
 
-<h3>Storing Arrays in Local Storage</h3>
-<p>You can also store arrays in Local Storage in the same way you store objects. Since arrays are valid JSON, you can convert them to strings and save them as values.</p>
-<pre><code>const hobbies = ["Reading", "Traveling", "Photography"];
+<p>In this example, I first made a JSON object and stored it in ”user”. I then converted the object into a string using stringify(). Finally, I put the string in local storage with localStorage.setItem(). The first argument to setItem() is the key associated with my string object, and the second argument is the actual variable. (https://stackoverflow.com/questions/3357553/how-do-i-store-an-array-in-localstorage: Here is a link for if you want to store an array in local storage.)</p>
 
-// Convert the array to a string
-const hobbiesString = JSON.stringify(hobbies);
+<h3>Pull that data</h3>
+<p>To retrieve data from local storage, we use the method localStorage.getItem(). This method returns the value stored for a specific key as a string. Since the JSON object was stringified, it needs to be un-stringified to become a usable JSON object using JSON.parse().</p>
+<p>The following code snippet shows how to implement the previous methods:</p>
+<code><pre>// Pull the JSON string from local storage
+let storedString = localStorage.getItem("user");
+//user is the key we stored the Silly Billy objects in
 
-// Store the array string in Local Storage
-localStorage.setItem("hobbies", hobbiesString);</code></pre>
+// un-stringify the object
+let user = JSON.parse(storedString);</code></pre>
+<p>In this example I used localStorage.getItem("user") to grab the string stored under the "user" key, then used JSON.parse() to change the user string back into a JavaScript object. Now you can access the properties of the object!</p>
 
-<h2>Accessing JSON Data from Local Storage</h2>
+<h3>Display a JSON object</h3>
+<p>Now that you can store and retrieve user, you might want to do something with it. Storing the information is kind of pointless if you don’t do anything with it.</p>
+<code><pre>// Repeat the previous code to get user into a JSON object
+let storedString = localStorage.getItem("user");
+let user = JSON.parse(storedString);
 
-<h3>Retrieving Data</h3>
-<p>To retrieve data from Local Storage, we use the <code>localStorage.getItem()</code> method. This method returns the value stored for a given key as a string. Since the data was previously stringified, we need to parse the string back into a JSON object or array using <code>JSON.parse()</code>.</p>
-<p>Here’s how you retrieve the stored JSON object and convert it back into a JavaScript object:</p>
-<pre><code>// Retrieve the JSON string from Local Storage
-const userString = localStorage.getItem("user");
-
-// Parse the string into a JavaScript object
-const user = JSON.parse(userString);
-
-// Now you can access the properties of the object
-console.log(user.name);  // Output: John Doe
-console.log(user.age);   // Output: 30</code></pre>
-
-<h3>Accessing Arrays from Local Storage</h3>
-<p>The process for accessing arrays is similar to that for objects. After retrieving the string, we use <code>JSON.parse()</code> to convert the string into an array.</p>
-<pre><code>// Retrieve the array string from Local Storage
-const hobbiesString = localStorage.getItem("hobbies");
-
-// Parse the string into a JavaScript array
-const hobbies = JSON.parse(hobbiesString);
-
-// Now you can access the elements of the array
-console.log(hobbies[0]);  // Output: Reading
-console.log(hobbies[1]);  // Output: Traveling</code></pre>
-
-<h2>Displaying JSON Data</h2>
-<p>Once you have retrieved and parsed the JSON data, you can display it on your web page. This is typically done using JavaScript to manipulate the DOM (Document Object Model).</p>
-
-<h3>Displaying JSON Objects</h3>
-<p>Suppose you want to display the user object on a webpage. You can retrieve the object from Local Storage, parse it, and display its properties in HTML elements.</p>
-<pre><code>// Retrieve and parse the user object
-const userString = localStorage.getItem("user");
-const user = JSON.parse(userString);
-
-// Display the user data on the webpage
+// Print the info in user to the webpage
 document.getElementById("name").innerText = user.name;
 document.getElementById("age").innerText = user.age;
-document.getElementById("status").innerText = user.isActive ? "Active" : "Inactive";</code></pre>
+document.getElementById("status").innerText = user.isOnline ? "Active" : "Inactive";</code></pre>
+<p>This code takes the values stored at name, age, and isOnline in user and adds them to a html element in the DOM (Document Object Model). It takes the elements with the ID name, and sets its text to what was stored in user.name. The ? "Active" : "Inactive” method will set the DOM text to Active if user.isOnline is true, and Inactive if false. </p>
 
-<h3>Displaying JSON Arrays</h3>
-<p>If the stored data is an array, you might want to loop through the array and display its elements.</p>
-<pre><code>// Retrieve and parse the hobbies array
-const hobbiesString = localStorage.getItem("hobbies");
-const hobbies = JSON.parse(hobbiesString);
-
-// Display the hobbies in a list on the webpage
-const hobbyList = document.getElementById("hobby-list");
-hobbies.forEach(hobby => {
-  const listItem = document.createElement("li");
-  listItem.innerText = hobby;
-  hobbyList.appendChild(listItem);
-});</code></pre>
-
-<h2>Best Practices for Storing and Accessing JSON Data in Local Storage</h2>
-<p>While Local Storage is a powerful tool, it’s important to follow best practices to ensure your application runs efficiently and securely.</p>
-<ul>
-    <li><strong>Limit the amount of data:</strong> Since Local Storage has a storage limit, avoid storing large amounts of data. Large objects or arrays may cause performance issues, particularly on slower devices.</li>
-    <li><strong>Check for availability:</strong> Always check if Local Storage is available in the user's browser before attempting to use it.</li>
-    <pre><code>if (typeof(Storage) !== "undefined") {
-  // Safe to use Local Storage
-} else {
+<h2>Helpful tips for storing data in local storage</h2>
+<p>Remember how local storage has a few drawbacks? Local storage is certainly a powerful tool, but it’s important to follow secure coding practices to make sure your webpage runs securely and smoothly. The first tip is to check if local storage is available before using it. </p>
+<p>You can do that using the following code: </p>
+<code><pre>if (typeof(Storage) === "undefined") {
   console.log("Local Storage is not supported in this browser.");
 }</code></pre>
-    <li><strong>Handle errors:</strong> Be prepared for potential errors when accessing Local Storage, such as invalid JSON or storage limitations. Use try-catch blocks to catch parsing errors:</li>
-    <pre><code>try {
+<p>This code will print a message to the page console if local storage is unable to be used. It is important to check for this to make sure that you can use local storage before trying to push data into it.</p>
+<p>Another tip is to keep track of the amount of info you are pushing into local storage. It has a storage limit and pushing too much information into it can cause problems in your computer. You should be especially cautious with large objects or arrays, as they may cause performance issues, especially on slower devices. (https://stackoverflow.com/questions/4391575/how-to-find-the-size-of-localstorage: Here is a link to how to check exactly how much space if left in your local storage.)</p>
+<p>Yet another tip is to prepare for potential errors when accessing local storage, such as invalid JSON or storage limitations. An easy way to handle this is using try-catch blocks to catch errors.</p>
+<p>This is easily handled in the following code:</p>
+
+<code><pre>try {
   const user = JSON.parse(localStorage.getItem("user"));
 } catch (e) {
   console.error("Error parsing JSON:", e);
 }</code></pre>
-    <li><strong>Encrypt sensitive data:</strong> Since Local Storage is accessible through JavaScript, avoid storing sensitive or personal information unless it is encrypted.</li>
-    <li><strong>Clear unused data:</strong> Periodically clean up unused or obsolete data from Local Storage to avoid using up storage space unnecessarily. You can use <code>localStorage.removeItem()</code> to remove specific items and <code>localStorage.clear()</code> to clear all stored data.</li>
-</ul>
 
-<h2>Conclusion</h2>
-<p>In this documentation, we have explored how to store, access, and display JSON data in Local Storage. Local Storage is a valuable tool for client-side storage in web applications, and when used properly, it can enhance user experiences by persisting data across sessions. By stringifying JSON data before storing it and parsing it back when needed, we can easily manage complex data structures in Local Storage.</p>
-<p>However, it’s essential to be mindful of storage limitations, security concerns, and performance issues when working with Local Storage. By following best practices, you can ensure that your use of Local Storage is both effective and efficient.</p>
+<p>Using try-catch statements to catch bugs early is something you should always do when writing code. </p>
+<p>My last tip is that you avoid storing any sensitive or personal information in local storage. Any data in local storage is accessible through JavaScript, so use encryption if you want to store confidential data in your local storage.</p>
+
+  <h2>Conclusion</h2>
+<p>Local storage is an incredibly useful tool when designing a website. It takes a burden off of the server, and allows each user’s browser to store information, making your website faster and more efficient. There are potential problems you should keep in mind while using local storage, but it is a resource that should be used when making a website.</p>
+<p>You now know how to store, access, and display JSON data in local storage! </p>
+
+</div>
+
+<footer>
+    <p>&copy; 2025 Brendan's Tutorial Blog. All rights reserved.</p>
+</footer>
 
 </body>
 </html>
