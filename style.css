@@ -53,6 +53,7 @@ code {
 }
 
 pre {
+    
     background-color: #e7f3fe; /* Light blue background for preformatted text */
     padding: 10px; /* Padding around preformatted text */
     border-radius: 4px; /* Rounded corners for preformatted text */
